@@ -1,29 +1,29 @@
-#' getqxt: obtain the age specific mortality surface
+#' getqxt: obtain the age-specific mortality surface
 #'
-#' getqxt interpolate the age specific mortality rates for a set of life tables
+#' getqxt interpolate the age specific mortality rates for a set of period life tables
 #'
 #' @param Qxt A surface of Five-ages mortality rates which should be a numerical matrix containing mortality rates without age identification column and time identification row
 #'
-#' @param nag the number of age groups
+#' @param nag The number of age groups
 #'
-#' @param t the number of years
+#' @param t The number of years
 #'
 #' @return qxt a matrix containing the age-specific mortality rates for age x in rows and for year t in columns
 #' @return lxt a matrix containing the age evolution of survivorship for the year t
 #' @return dxt a matrix containing the theoretical deaths occured at age x and year t
 #' @return qxtl the age specific mortality rates interpolated using the Lagrange method for each year t
 #' @return qxtk the age specific mortality rates interpolated using the Karup-king method for each year t
-#' @return jonct_ages a vector containing, for each year t, the ages where qxtk and qxtl have been joined
+#' @return junct_ages a vector containing, for each year t, the ages where qxtk and qxtl have been joined
 #'
-#' @examples getqxt(matrix(rep(c(0.12, seq(0.05, 0.5,by=0.05)), 5), byrow=FALSE, ncol=5), 11, 5)
-#'
+#' @examples
+#' getqxt(Qxt=LT, nag=17, t=38)
 #' @author Farid FLICI
 #' @export
 getqxt <- function(Qxt, nag ,t){
 
-  if(             t==1                               ) { Qxt <- matrix(Qxt, ncol=1)}
+  ifelse( t==1 ,  Qxt <- matrix(Qxt, ncol=1), Qxt <- as.matrix(Qxt))
 
-  if((is.matrix(Qxt)==FALSE)|(is.numeric(Qxt)==FALSE)) { stop("Warning: Qxt needs to be a numerical matrix !") }else{
+  if((is.numeric(Qxt)==FALSE)) { stop("Warning: Qxt needs to be numerical !") }else{
 
     if(nag != nrow(Qxt) ){ stop("Warning: The number of age groups (nag) doesn't meet the number of rows in Qxt")     }else{
 
@@ -106,14 +106,14 @@ getqxt <- function(Qxt, nag ,t){
         lxtk[1,] <- matrix(rep(10000), ncol=p, nrow=1    )
         for(i in 1:n)    {   lxtk[(i+1), ]  <-  lxtk[i, ] - dxt[i, ]                 }
         qxtk <- as.matrix(dxt)/as.matrix(lxtk[1:(nrow(lxtk)-1),])
-        # Jonction:
+        # Junction:
         if(t==1){
                    err_vec <- matrix(rep(NA), ncol=1, nrow=(n - 29))
                    for (x in 11:(n-19)){     err               <- (log(qxtk[(x-2):(x+2), ])-log(qxtl[(x-2):(x+2) , ]) )
                    err_vec[(x-20),]  <- t(err)%*%err    }
 
-                   jonct_age <- which.min(err_vec)+11
-                   qx<-matrix(c(qxtl[1:(jonct_age-1), ], qxtk[jonct_age:n, ]), ncol=1)
+                   junct_age <- which.min(err_vec)+11
+                   qx<-matrix(c(qxtl[1:(junct_age-1), ], qxtk[junct_age:n, ]), ncol=1)
                    rownames(qx) <-c(0:x_max)
 
                    lx <- matrix(rep(NA), nrow=(n+1),ncol=1 )
@@ -128,7 +128,17 @@ getqxt <- function(Qxt, nag ,t){
                    qxk <- qxtk
                    qxl <- qxtl
 
-                   list(qx=qx, lx=lx, dx=dx, qxk=qxk, qxl=qxl, jonct_age=jonct_age)
+                   #Qxt_test
+                   Qxt_test = matrix(rep(0), ncol=ncol(Qxt), nrow=nrow(Qxt))
+                   rownames(Qxt_test) <-rownames(Qxt)
+                   dimnames(Qxt_test) <-dimnames(Qxt)
+                   for(i in 1:1){ Qxt_test[1,] = qx[1,]}
+                   for(i in 2:2){ Qxt_test[2,] = 1-((1-qx[2,])*(1-qx[3,])*(1-qx[4,])*(1-qx[5,]))}
+                   for(i in 3:nrow(Qxt_test)){ Qxt_test[i,] = 1-((1-qx[(1+(5*(i-2))),])*(1-qx[(2+(5*(i-2))),])*(1-qx[(3+(5*(i-2))),])*(1-qx[(4+(5*(i-2))),])*(1-qx[(5+(5*(i-2))),]))}
+
+                   #list of outputs
+
+                   list(qx=qx, lx=lx, dx=dx, qxk=qxk, qxl=qxl, junct_age=junct_age , Qxt=Qxt,Qxt_test=Qxt_test)
 
         }else{
                    err_mat <- matrix(rep(NA), ncol=p, nrow=(n - 29))
@@ -136,12 +146,12 @@ getqxt <- function(Qxt, nag ,t){
                    err                <- (log(qxtk[(x-2):(x+2), ])-log(qxtl[(x-2):(x+2) , ]) )
                    err_mat[(x-20), ]  <-  colSums( err*err)                                       }
 
-                   jonct_ages <- matrix(rep(NA), nrow=1, ncol=p )
+                   junct_ages <- matrix(rep(NA), nrow=1, ncol=p )
 
-                   for (t in 1:p){  jonct_ages[ ,t] <- which.min(err_mat[,t])+11    }
+                   for (t in 1:p){  junct_ages[ ,t] <- which.min(err_mat[,t])+11    }
 
                    qxt <- matrix(rep(NA), ncol=p, nrow=n    )
-                   for (t in 1: p){   qxt[,t]<-matrix(c(qxtl[1:(jonct_ages[,t]-1), t], qxtk[jonct_ages[,t]:n, t]), ncol=1)  }
+                   for (t in 1: p){   qxt[,t]<-matrix(c(qxtl[1:(junct_ages[,t]-1), t], qxtk[junct_ages[,t]:n, t]), ncol=1)  }
                    rownames(qxt) <- c(0: x_max)
 
                    lxt <- matrix(rep(NA), nrow=(n+1),ncol=p )
@@ -153,7 +163,17 @@ getqxt <- function(Qxt, nag ,t){
                    dxt <- lxt[1:n,] * qxt
                    rownames(dxt) <-c(0:x_max)
 
-                   list(qxt=qxt, lxt=lxt, dxt=dxt, qxtk=qxtk, qxtl=qxtl, jonct_ages=jonct_ages)
+                   #Qxt_test
+                   Qxt_test = matrix(rep(0), ncol=ncol(Qxt), nrow=nrow(Qxt))
+                   rownames(Qxt_test) <-rownames(Qxt)
+                   dimnames(Qxt_test) <-dimnames(Qxt)
+                   for(i in 1:1){ Qxt_test[1,] = qxt[1,]}
+                   for(i in 2:2){ Qxt_test[2,] = 1-((1-qxt[2,])*(1-qxt[3,])*(1-qxt[4,])*(1-qxt[5,]))}
+                   for(i in 3:nrow(Qxt_test)){ Qxt_test[i,] = 1-((1-qxt[(1+(5*(i-2))),])*(1-qxt[(2+(5*(i-2))),])*(1-qxt[(3+(5*(i-2))),])*(1-qxt[(4+(5*(i-2))),])*(1-qxt[(5+(5*(i-2))),]))}
+
+                   #list of outputs
+
+                   list(qxt=qxt, lxt=lxt, dxt=dxt, qxtk=qxtk, qxtl=qxtl, junct_ages=junct_ages, Qxt=Qxt,Qxt_test=Qxt_test)
 
         }
 
@@ -174,10 +194,10 @@ getqxt <- function(Qxt, nag ,t){
 #' @return dx a vector containing the theoretical deaths occured at age x
 #' @return qxtl age specific mortality rates interpolated using the Lagrange method
 #' @return qxtk age specific mortality rates interpolated using the Karup-king method
-#' @return jonct_age the age where qxk and qxl have been joined
+#' @return junct_age the age where qxk and qxl have been joined
 #'
 #' @examples
-#' getqx(c(0.12, seq(0.05, 0.8,by=0.05)), 17)
+#' getqx(Qx=LT[,8], nag=17)
 #'
 #' @author Farid FLICI
 #' @export

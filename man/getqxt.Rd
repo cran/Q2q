@@ -2,16 +2,16 @@
 % Please edit documentation in R/Q2q.R
 \name{getqxt}
 \alias{getqxt}
-\title{getqxt: obtain the age specific mortality surface}
+\title{getqxt: obtain the age-specific mortality surface}
 \usage{
 getqxt(Qxt, nag, t)
 }
 \arguments{
 \item{Qxt}{A surface of Five-ages mortality rates which should be a numerical matrix containing mortality rates without age identification column and time identification row}
 
-\item{nag}{the number of age groups}
+\item{nag}{The number of age groups}
 
-\item{t}{the number of years}
+\item{t}{The number of years}
 }
 \value{
 qxt a matrix containing the age-specific mortality rates for age x in rows and for year t in columns
@@ -24,14 +24,13 @@ qxtl the age specific mortality rates interpolated using the Lagrange method for
 
 qxtk the age specific mortality rates interpolated using the Karup-king method for each year t
 
-jonct_ages a vector containing, for each year t, the ages where qxtk and qxtl have been joined
+junct_ages a vector containing, for each year t, the ages where qxtk and qxtl have been joined
 }
 \description{
-getqxt interpolate the age specific mortality rates for a set of life tables
+getqxt interpolate the age specific mortality rates for a set of period life tables
 }
 \examples{
-getqxt(matrix(rep(c(0.12, seq(0.05, 0.5,by=0.05)), 5), byrow=FALSE, ncol=5), 11, 5)
-
+getqxt(Qxt=LT, nag=17, t=38)
 }
 \author{
 Farid FLICI

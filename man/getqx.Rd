@@ -22,13 +22,13 @@ qxtl age specific mortality rates interpolated using the Lagrange method
 
 qxtk age specific mortality rates interpolated using the Karup-king method
 
-jonct_age the age where qxk and qxl have been joined
+junct_age the age where qxk and qxl have been joined
 }
 \description{
 It interpolate the age specific mortality rates
 }
 \examples{
-getqx(c(0.12, seq(0.05, 0.8,by=0.05)), 17)
+getqx(Qx=LT[,8], nag=17)
 
 }
 \author{
