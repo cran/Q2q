@@ -2,32 +2,32 @@
 % Please edit documentation in R/Q2q.R
 \name{getqxt}
 \alias{getqxt}
-\title{getqxt: obtain the age-specific mortality surface}
+\title{getqxt}
 \usage{
 getqxt(Qxt, nag, t)
 }
 \arguments{
-\item{Qxt}{A surface of Five-ages mortality rates which should be a numerical matrix containing mortality rates without age identification column and time identification row}
+\item{Qxt}{A numerical matrix of Five-ages mortality rates without an age identification column and a time identification row.}
 
-\item{nag}{The number of age groups}
+\item{nag}{The number of age groups.}
 
-\item{t}{The number of years}
+\item{t}{The number of years.}
 }
 \value{
-qxt a matrix containing the age-specific mortality rates for age x in rows and for year t in columns
+qxt : a matrix containing the age-specific mortality rates by age x in rows and year t in columns.
 
-lxt a matrix containing the age evolution of survivorship for the year t
+lxt : a matrix containing the evolution of the population of survivors over age x for each year t.
 
-dxt a matrix containing the theoretical deaths occured at age x and year t
+dxt : a matrix containing the theoretical distribution of deaths by age x for each year t.
 
-qxtl the age specific mortality rates interpolated using the Lagrange method for each year t
+qxtl : the age-specific mortality rates interpolated using the Lagrange method for each year t.
 
-qxtk the age specific mortality rates interpolated using the Karup-king method for each year t
+qxtk : the age specific mortality rates interpolated using the Karup-King method for each year t.
 
-junct_ages a vector containing, for each year t, the ages where qxtk and qxtl have been joined
+junct_ages : a vector containing the ages where qxtk and qxtl have been joined, for each year t.
 }
 \description{
-getqxt interpolate the age specific mortality rates for a set of period life tables
+It enables for interpolating age-specific mortality rates for a multi-annual life tables.
 }
 \examples{
 getqxt(Qxt=LT, nag=17, t=38)

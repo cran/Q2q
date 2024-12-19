@@ -28,7 +28,15 @@ You can install the released version of Q2q from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-#install.packages("Q2q")
+install.packages("Q2q", repos='http://cran.us.r-project.org')
+#> Installation du package dans 'C:/Users/lenovo/AppData/Local/R/win-library/4.2'
+#> (car 'lib' n'est pas spécifié)
+#> 
+#>   Une version binaire est disponible mais la version du source est plus
+#>   récente:
+#>     binary source needs_compilation
+#> Q2q  0.1.0  0.1.1             FALSE
+#> installation du package source 'Q2q'
 ```
 
 Before it can be used, the package needs to be called.
@@ -49,13 +57,6 @@ mortality surface provides the five ages mortality rates, usually noted
 as $_nQ_{x,t}$, with $x$ representing the age and $t$ the year and $n$
 the length of the age interval which is set to be $5$ except for age $0$
 and the age group $1-4$.
-
-The general form of the function is `getqxt(Qxt, nag, t)` , where `Qxt`
-is the matrix (or a numerical data frame) of the five ages mortality
-rates without a header or identification column. The number of rows in
-the matrix should be equal to the number of age groups referred to as
-`nag` in the function. The number of years in the mortality matrix,
-denoted by `t` , should be equal to the number of columns in `Qxt`.
 
 The primary output of the function is `qxt`, which is a matrix of the
 age-specific death rates for a given age $x$ and year $t$. This matrix
@@ -97,18 +98,14 @@ mortality rates (before interpolation), i.e.`Qxt`, and those
 recalculated from the interpolated rates, i.e., `Qxt_test`. Good results
 suggest that the errors observed between `Qxt` and `Qxt_test` to be
 below a well defined ceiling at all ages. In our case, we defined the
-maximum tolered error at `0.005`, which seems reasonable in the case of
-five-age mortality rates.
-
-``` r
-data("LT")
-```
+maximum tolerated error at `0.005`, which seems reasonable in the case
+of five-age mortality rates.
 
 The test can be implemented using the following code:
 
 ``` r
 test_that("Fidelity test", {
- #   data("LT")
+ data("LT")
   Qxt = LT
   expect_equal(getqxt(Qxt, nag=nrow(Qxt), t=ncol(Qxt))$Qxt,getqxt(Qxt, nag=nrow(Qxt), t=ncol(Qxt))$Qxt_test ,tolerance=0.005)
 
@@ -129,7 +126,7 @@ used to implement the test:
 
 ``` r
 test_that("zero-one test", {
-#  data("LT")
+  data("LT")
   Qxt = LT
   q = getqxt(Qxt, nag=nrow(Qxt), t=ncol(Qxt))$qxt
   n = nrow(q)
@@ -175,7 +172,7 @@ We plot the mortality curve.
 plot(x=c(0,1, seq(5, (length(Ax)-2)*5, by=5)), y=log(Ax), type="b", xlab="Age", ylab="log(nQx)", main="Figure 1. Mortality Rates (Algeria, males, 1995)", cex=1 ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" />
 
 We interpolate `q_{x,t}` using `getqx()`
 
@@ -214,28 +211,19 @@ str(interpolated_curve)
 We plot the interpolated mortality curve using `plot()`
 
 ``` r
-plot(x=c(0:79), y=log(interpolated_curve$qx), type="b", pch=19, xlab="Age", ylab="log(qx)", main="Figure 2. Interpolated Mortality Rates (Algeria, males, 1995", cex=0.75)
+plot(x=c(0:79), y=log(interpolated_curve$qx), type="b", pch=19, xlab="Age", ylab="log(qx)", main="Figure 2. Interpolated Mortality Rates (Algeria, males, 1995)", cex=0.75)
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" />
 
 ``` r
-plot(x=c(5:79), y=log(interpolated_curve$qxk[6:80]), type="l", lwd=5, pch=1,xlab="Age", ylab="log(qx)", main="Figure 3. Interpolated Mortality Rates (Algeria, males, 1995) - Junction age", xlim=c(0,80), col="gray", alpha=0.5)
-#> Warning in plot.window(...): "alpha" n'est pas un paramètre graphique
-#> Warning in plot.xy(xy, type, ...): "alpha" n'est pas un paramètre graphique
-#> Warning in axis(side = side, at = at, labels = labels, ...): "alpha" n'est pas
-#> un paramètre graphique
-
-#> Warning in axis(side = side, at = at, labels = labels, ...): "alpha" n'est pas
-#> un paramètre graphique
-#> Warning in box(...): "alpha" n'est pas un paramètre graphique
-#> Warning in title(...): "alpha" n'est pas un paramètre graphique
+plot(x=c(5:79), y=log(interpolated_curve$qxk[6:80]), type="l", lwd=5, pch=1,xlab="Age", ylab="log(qx)", main="Figure 3. Interpolated Mortality Rates (Algeria, males, 1995) - Junction age", xlim=c(0,80), col="gray")
 lines(x=c(0:69), y=log(interpolated_curve$qxl), lwd=2)
 lines(x=rep(interpolated_curve$junct_age, 2), y=c(min(log(interpolated_curve$qxl)),max(log(interpolated_curve$qxk))), lty=2, lwd=1.25, col="red")
 legend(x=2, y=-3, c("Lagrange Method", "Karup-King Method", "Junction age"), lty=c(1,1,2), col=c("black", "gray", "red"), lwd=c(2,5,2))
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" />
 
 We validate the obtained results using the fidelity test and the
 Zero-One test.
@@ -243,14 +231,14 @@ Zero-One test.
 ``` r
 test_that("Fidelity test", {
  # data("LT")
-  Qx = LT[, 11]
+  Qx = LT[, 18]
   expect_equal( getqx(Qx, nag=length(Qx))$Qxt, getqx(Qx, nag=length(Qx))$Qxt_test,tolerance=0.005)
    })
 #> Test passed
 
 test_that("zero-one test", {
  # data("LT")
-  Qx = LT[, 11]
+  Qx = LT[, 18]
   q = getqx(Qx, nag=length(Qx))$qx
   n = nrow(q)
   t = ncol(q)
@@ -298,7 +286,7 @@ text3D(x= 80, y=2010, z= 0.5, labels=c("Year"), add = T, plot=F)
 text3D(x= c(82, 80, 80, 76), y=c(1983, 2001, 2008, 2016), z= c(-0.4,-0.5,-0.6,-0.4), labels=c("1977", "1995", "2005", "2014"), add = T)
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" />
 
 Then, we deduce matrix of the single ages mortality rates using
 `getqxt() of the $Q2q$` package.
@@ -346,7 +334,7 @@ text3D(x= 80, y=2010, z= 0.5, labels=c("Year"), add = T, plot=F)
 text3D(x= c(84, 82, 82, 79), y=c(1983, 2001, 2008, 2016), z= c(-1.5,-1.5,-1.6,-1.5), labels=c("1977", "1995", "2005", "2014"), add = T)
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" />
 
 We validate the obtained results using the Fidelity Test and the
 Zero-One Test:
@@ -413,7 +401,7 @@ Qx = as.numeric(LT_3$qx[1:m])
 plot(x=c(0,1, seq(5, (length(Qx)-2)*5, by=5)), y=log(Qx), type="b", xlab="Age", ylab="log(nQx)", main="Figure 6. 5-Age Mortality Rates (Japan, females, 1950)", cex=1 ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;" />
 
 ``` r
 
@@ -424,7 +412,7 @@ qx = getqx(Qx, nag=m)
 plot(x=c(0:(5*(m-1)-1)), y=log(qx$qx), type="b", pch=19, xlab="Age", ylab="log(qx)", main="Figure 7. Interpolated Mortality Rates (Japan, females, 1950)", cex=0.75)
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-20-2.png" width="80%" style="display: block; margin: auto;" />
 
 ``` r
 
@@ -489,7 +477,7 @@ text3D(x= 95, y=1968, z= 0.8, labels=c("Year"), add = T, plot=F)
 text3D(x= c(98, 92, 86), y=c(1953, 1963, 1973), z= c(0.15,0.15,0.15), labels=c("1950", "1960", "1970"), add = T)
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="80%" style="display: block; margin: auto;" />
 
 ``` r
 
@@ -509,7 +497,7 @@ text3D(x= 95, y=1968, z= 0.8, labels=c("Year"), add = T, plot=F)
 text3D(x= c(96, 94, 80), y=c(1959, 1967, 1975), z= c(-0.1,-0.15,0.2), labels=c("1950", "1960", "1970"), add = T)
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-2.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-21-2.png" width="80%" style="display: block; margin: auto;" />
 
 ``` r
 

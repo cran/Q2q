@@ -7,25 +7,25 @@
 getqx(Qx, nag)
 }
 \arguments{
-\item{Qx}{Five-ages mortality rates which can be a vector created using  or a column of a numerical matrix}
+\item{Qx}{Five-ages mortality rates which can be a vector created using combine function 'c()' or a column of a numerical matrix.}
 
-\item{nag}{number of age groups}
+\item{nag}{number of age groups.}
 }
 \value{
-qx age-specific mortality rates
+qx : a vector of age-specific mortality rates.
 
-lx a vector containing the age evolution of survivorship
+lx : a vector of the age evolution of the population of survivors.
 
-dx a vector containing the theoretical deaths occured at age x
+dx : a vector of the theoretical distribution of deaths by age.
 
-qxtl age specific mortality rates interpolated using the Lagrange method
+qxl : a vector of the age-specific mortality rates interpolated using the Lagrange method.
 
-qxtk age specific mortality rates interpolated using the Karup-king method
+qxk : a vector of the age-specific mortality rates interpolated using the Karup-King method.
 
-junct_age the age where qxk and qxl have been joined
+junct_age : the age where qxk and qxl have been joined.
 }
 \description{
-It interpolate the age specific mortality rates
+It enables interpolating age-specific mortality rates from an annual life-table.
 }
 \examples{
 getqx(Qx=LT[,8], nag=17)
